@@ -1,0 +1,28 @@
+.popup-page{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    height:400px;
+    width: 800px;
+    .popup-page-title{
+        padding:10px 0;
+        font-size: 16px;
+        font-weight: 650;
+        text-align: center;
+        border-bottom: 1px solid #ccc;
+    }
+    .waybill-panel{
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: stretch;
+        .waybill-panel-title{
+            margin:10px 0;
+            font-size: 15px;
+            font-weight: 650;
+            margin-left:10px;
+        }
+    
+    }
+}

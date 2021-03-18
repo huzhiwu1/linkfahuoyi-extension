@@ -1,0 +1,11 @@
+.waybill-model{
+    width: 809px;
+    max-height: 200px;
+    overflow-y: auto;
+   overflow-x: hidden;
+    display: grid;
+    justify-items: center;
+    align-items: center;
+    grid-template-columns: 1fr 1.1fr repeat(3,1fr) 44px;
+    grid-auto-rows: 40px;
+}

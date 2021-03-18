@@ -1,0 +1,34 @@
+{
+  "name": "linkfahuoyi-exension",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "dev": "cross-env NODE_ENV=development webpack --config ./webpack/webpack.dev.js --watch",
+    "build": "cross-env NODE_ENV=production webpack --config ./webpack/webpack.prod.js"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.126",
+    "@types/react": "^17.0.0",
+    "@types/react-dom": "^17.0.0",
+    "antd": "^4.9.3",
+    "clean-webpack-plugin": "^3.0.0",
+    "copy-webpack-plugin": "^7.0.0",
+    "cross-env": "^7.0.3",
+    "crx": "^5.0.1",
+    "css-loader": "^5.0.1",
+    "html-webpack-plugin": "^4.5.0",
+    "node-sass": "^5.0.0",
+    "sass-loader": "^10.1.0",
+    "style-loader": "^2.0.0",
+    "ts-loader": "^8.0.12",
+    "webpack": "^5.10.1",
+    "webpack-cli": "^4.2.0",
+    "webpack-merge": "^5.7.0"
+  },
+  "dependencies": {
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
+    "typescript": "^4.1.3"
+  }
+}
