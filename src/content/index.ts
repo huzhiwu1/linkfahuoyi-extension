@@ -2,7 +2,7 @@
 
 
 import { message } from "antd";
-import { resolveModuleName } from "typescript";
+
 import { Print, StartPrint } from "../types";
 
 export enum PlatformCode {
@@ -192,10 +192,9 @@ chrome.runtime.onMessage.addListener(function (message: Message, sender, respons
 chrome.runtime.onConnect.addListener(function (port) {
     if (port.name === "getPrinter") {
         port.onMessage.addListener(function (msg) {
-            console.log(msg, ' contentmsg')
+
             if (msg.action === "getPrint") {
 
-                console.log(1)
                 // @ts-ignore
                 let options: HTMLOptionElement[] = document.querySelectorAll("#elContainer>div>.form-inline.panel-border.p15.search-panel>div[class]>.form-group.mr20[style]>select.form-control>option")
                 // console.log(2)
@@ -213,12 +212,35 @@ chrome.runtime.onConnect.addListener(function (port) {
 })
 
 // 厂家content.js页面
-chrome.runtime.onMessage.addListener(function (message, sender, response) {
-    if (message.action === "newWaybillNo") {
-        window.postMessage(message, "*")
-    }
-})
+// chrome.runtime.onMessage.addListener(function (message, sender, response) {
+//     if (message.action === "newWaybillNo") {
+//         window.postMessage(message, "*")
+//     }
+// })
+// let FactoryPost = chrome.runtime.connect({ name: "getMessage" })
+// FactoryPost.onMessage.addListener(function (msg) {
+//     if (msg.action === "newWaybillNo") {
+//         window.postMessage(msg, "*")
+//     }
+// })
+chrome.runtime.onConnect.addListener(function (port) {
+    if (port.name === "sendNewWaybillNo") {
 
+        console.log(port, 'port')
+        port.onMessage.addListener(function (msg) {
+            console.log(msg, 'msg')
+
+            if (msg.action === "sendNewWaybillNo") {
+
+                port.postMessage({ action: "answer" })
+
+
+                window.postMessage({ action: "newWaybillNo", value: msg.value }, '*')
+            }
+        })
+    }
+
+})
 
 // inject.js
 
@@ -230,7 +252,8 @@ const startPrintWayBill = function (params: Params) {
         // @ts-ignore
         window.onmessage = function (res) {
             if (res.data.action === "newWaybillNo") {
-                resolve(res.data.value)
+                res.data.value.includes("失败") ? reject(res.data.value) : resolve(res.data.value)
+
             }
         }
     })
@@ -239,6 +262,22 @@ const startPrintWayBill = function (params: Params) {
 
 };
 
+/**
+ * 发货易content
+ */
+
+window.addEventListener("message", function (msg) {
+
+    if (msg.data.action === "sendNewWaybillNo") {
+
+        // chrome.runtime.onConnect.addListener(function (port) {
+        //     console.log(port, 'port')
+        //     port.postMessage(msg.data)
+        // })
+        chrome.runtime.sendMessage(msg.data)
+    }
+
+})
 
 function injectCustomjs() {
 
@@ -246,23 +285,41 @@ function injectCustomjs() {
     temp.innerHTML = `window.startPrintWayBill=${startPrintWayBill}`
     document.body.appendChild(temp)
 
+
     let tbodyDom = document.querySelector("#elContainer>div>table>tbody")
+
     if (tbodyDom) {
         let observe = new MutationObserver(function (mutations, observe) {
 
             let td = mutations[0].addedNodes[0].childNodes[3]
+
+
             if (!td) return;
             let tdObserve = new MutationObserver(function (mutations, observe) {
+                console.log(mutations, 'mutations')
                 mutations.forEach(item => {
                     item.addedNodes.forEach(node => {
+
+                        // @ts-ignore
+                        if (node.nodeType == 3 && node.textContent.includes("失败")) {
+                            console.log("发送")
+                            return window.postMessage({ action: "sendNewWaybillNo", value: node.textContent }, "*")
+                        }
                         if (node.nodeName == "DIV") {
                             let text = node.childNodes[2].textContent;
                             console.log(text, 'text')
-                            // window.postMessage({ action: "newWaybillNo", value: text }, "*")
+                            window.postMessage({ action: "sendNewWaybillNo", value: text }, "*")
                             // 从发货易页面发消息给bg
-                            chrome.runtime.sendMessage({ action: "newWaybillNo", value: text }, function (res) {
+                            // chrome.runtime.sendMessage({ action: "newWaybillNo", value: text }, function (res) {
 
-                            })
+                            // })
+                            // console.log("fahuoyi")
+                            // let fahuoyiPort = chrome.runtime.connect({ name: "sendMessage" })
+                            // fahuoyiPort.postMessage({ action: "newWaybillNo", value: text })
+                            // chrome.runtime.onConnect.addListener(function (port) {
+                            //     console.log(port, 'port')
+                            //     port.postMessage({ action: "newWaybillNo", value: text })
+                            // })
 
                         }
                     })
@@ -270,7 +327,9 @@ function injectCustomjs() {
             })
             tdObserve.observe(td, {
                 childList: true,
-
+                characterData: true,
+                subtree: true,
+                attributes: true
             })
 
 

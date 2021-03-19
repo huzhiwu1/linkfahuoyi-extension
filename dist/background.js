@@ -38,17 +38,30 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
             // }
         });
     }
-    else if (message.action === "newWaybillNo") {
+    else if (message.action === "sendNewWaybillNo") {
         // 从bg页面转发给厂家页面的content.js
         chrome.tabs.query({
             url: config_1.factoryContentUrls
         }, function (tabs) {
             tabs && tabs.forEach(function (tab) {
-                chrome.tabs.sendMessage(tab.id, message);
+                // chrome.tabs.sendMessage(tab.id!, message)
+                var port = chrome.tabs.connect(tab.id, { name: "sendNewWaybillNo" });
+                port.onMessage.addListener(function (msg, port) {
+                    if (msg.action === "answer") {
+                        console.log(msg, port, 'bg');
+                        port.disconnect();
+                    }
+                });
+                port.postMessage(message);
             });
         });
+        // let port = chrome.runtime.connect({ name: "bgSendMessage" })
+        // port.postMessage(message)
     }
 });
+// chrome.runtime.onConnect.addListener(function (msg) {
+//     console.log(msg, 'msgbg')
+// })
 
 
 /***/ }),
@@ -62,7 +75,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.factoryContentUrls = void 0;
-exports.factoryContentUrls = ["http://admin.phonecase.dankal.cn/*", "*://*.fahuoyi.com/*", "http://localhost:8083/*", "http://admin.test.rtxmdz.com/*", "http://admin.rtxmdz.com/*"];
+exports.factoryContentUrls = ["http://localhost:8080/*", "*://diy.quyinmao.com/*"];
 
 
 /***/ }),
