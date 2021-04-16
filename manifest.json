@@ -23,7 +23,8 @@
 			"matches": [
 				"*://*.fahuoyi.com/*",
 				"*://diy.quyinmao.com/*",
-				"http://localhost:8080/*"
+				"http://localhost:8080/*",
+				"*://*.quyinmao.com/*"
 			],
 			"js": ["content.js"],
 			"run_at": "document_idle"

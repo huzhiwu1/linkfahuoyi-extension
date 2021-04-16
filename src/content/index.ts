@@ -30,7 +30,7 @@ interface Response {
 window.addEventListener("message", function (res: Response) {
 
     if (res.data.action === "StartPrint") {
-        chrome.storage.local.get({ list: [] }, function (storage) {
+        chrome.storage?.local.get({ list: [] }, function (storage) {
             // @ts-ignore
             if (storage.list.length == 0 || !storage.list[0].wayCompanyId || !storage.list[0].waybillTemplateList.some(item => item)) {
                 alert("请选择快递模板")
@@ -67,6 +67,8 @@ const printWayBillByOld = function (waybillNo: string, wayCompanyId: string) {
         let serachBtn = document.querySelector(".form-group>.btn.btn-primary[type=button]") as HTMLButtonElement
         let printDom = document.querySelector("#elContainer>div>.form-inline.panel-border.p15.search-panel>div[class]>.form-group.mr20[style]>select.form-control") as HTMLSelectElement
         let autoDom = document.querySelectorAll("#elContainer>div>.form-inline.panel-border.p15.search-panel>div.mt10>div.form-group.mr20>select.form-control")[1] as HTMLSelectElement
+        // 默认参数写死
+        let hiddenInputDom = document.querySelector("#forcePrintMergerOrderInput") as HTMLInputElement
 
         let printId: string
         // @ts-ignore
@@ -98,6 +100,10 @@ const printWayBillByOld = function (waybillNo: string, wayCompanyId: string) {
         // 6.输入运单号
         // selectDom.__reactEventHandlers$8wsw7c8olk.onChange({ target: { value: SelectOptions.waybillNo } })
         inputDom.value = waybillNo
+
+        // 7.默认参数写死
+        hiddenInputDom.value = "true"
+
         serachBtn.click()
     })
 
@@ -137,7 +143,8 @@ const printWayBillByNew = function ({ orderNo, wayCompanyId, platform }: Pick<Pa
         let printDom = document.querySelector("#elContainer>div>.form-inline.panel-border.p15.search-panel>div[class]>.form-group.mr20[style]>select.form-control") as HTMLSelectElement
         let autoDom = document.querySelectorAll("#elContainer>div>.form-inline.panel-border.p15.search-panel>div.mt10>div.form-group.mr20>select.form-control")[1] as HTMLSelectElement
 
-
+        // 默认参数写死
+        let hiddenInputDom = document.querySelector("#forcePrintMergerOrderInput") as HTMLInputElement
 
         //1.点击 获取新单号打印
         newOrderBtn.click()
@@ -165,7 +172,11 @@ const printWayBillByNew = function ({ orderNo, wayCompanyId, platform }: Pick<Pa
         bySelf.dispatchEvent(new Event("change", { bubbles: true }))
         //7.输入订单编号
         inputDom.value = orderNo
-        //8.点击搜索并打印
+
+        // 8.默认参数写死
+        hiddenInputDom.value = "true"
+
+        //9.点击搜索并打印
         searchDom.click()
 
     })

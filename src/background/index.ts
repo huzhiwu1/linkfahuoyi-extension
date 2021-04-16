@@ -1,9 +1,7 @@
 
-import { PlatformCode } from "../content";
 import { factoryContentUrls } from "../config";
 import { StartPrint, Print } from "../types";
-import { Children } from "react";
-import { convertLegacyProps } from "antd/lib/button/button";
+
 //     platform: PlatformCode,// 平台编码，淘系及其他平台订单模板的为0，拼多多订单的为1，京东订单的为2
 const PlatfromsMap = new Map([
     [0, /.+:\/\/a.*\.fahuoyi.com\/scanPrinting\/index/],
