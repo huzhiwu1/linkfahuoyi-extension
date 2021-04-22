@@ -311,10 +311,12 @@ function injectCustomjs() {
                 mutations.forEach(item => {
                     item.addedNodes.forEach(node => {
 
+
                         // @ts-ignore
-                        if (node.nodeType == 3 && node.textContent.includes("失败")) {
-                            console.log("发送")
-                            return window.postMessage({ action: "sendNewWaybillNo", value: node.textContent }, "*")
+                        if (node.nodeType == 3 && node.parentElement?.className.includes("text-danger")) {
+
+                            // @ts-ignore
+                            return window.postMessage({ action: "sendNewWaybillNo", value: node?.wholeText }, "*")
                         }
                         if (node.nodeName == "DIV") {
                             let text = node.childNodes[2].textContent;
