@@ -75,10 +75,12 @@ const printWayBillByOld = function (waybillNo: string, wayCompanyId: string) {
         res.list.forEach(item => {
 
             if (item.wayCompanyId === wayCompanyId) {
-                printId = item.printId
+                printId = item.printId === "仅获取电子面单号不打印面单" ? "isGenerateWaybillNoOnly" : item.printId
+                // printId = item.printId
             }
 
         })
+
         // 1.选择旧单号打印
         oldOptionDom.click()
 
@@ -123,11 +125,11 @@ const printWayBillByNew = function ({ orderNo, wayCompanyId, platform }: Pick<Pa
 
             if (item.wayCompanyId === wayCompanyId) {
                 waybillTemplate = item.waybillTemplateList[platform]
-                printId = item.printId
+                printId = item.printId === "仅获取电子面单号不打印面单" ? "isGenerateWaybillNoOnly" : item.printId
+                // printId = item.printId
             }
 
         })
-
 
         let newOrderBtn = document.querySelector(".form-group.mr20>.radio-inline.mr10") as HTMLLabelElement
 
@@ -210,9 +212,12 @@ chrome.runtime.onConnect.addListener(function (port) {
                 let options: HTMLOptionElement[] = document.querySelectorAll("#elContainer>div>.form-inline.panel-border.p15.search-panel>div[class]>.form-group.mr20[style]>select.form-control>option")
                 // console.log(2)
                 // console.log(options, options[0].value, '3')
+
                 let arr = []
                 for (let i = 0; i < options.length; i++) {
-                    arr.push(options[i].value)
+
+                    arr.push(options[i].textContent)
+                    // arr.push(options[i].value)
                 }
 
                 port.postMessage(arr)
@@ -237,16 +242,16 @@ chrome.runtime.onConnect.addListener(function (port) {
 chrome.runtime.onConnect.addListener(function (port) {
     if (port.name === "sendNewWaybillNo") {
 
-        console.log(port, 'port')
+        // console.log(port, 'port')
         port.onMessage.addListener(function (msg) {
-            console.log(msg, 'msg')
+            // console.log(msg, 'msg')
 
             if (msg.action === "sendNewWaybillNo") {
 
                 port.postMessage({ action: "answer" })
 
 
-                window.postMessage({ action: "newWaybillNo", value: msg.value }, '*')
+                window.postMessage({ action: "newWaybillNo", value: msg.value, result: msg.result }, '*')
             }
         })
     }
@@ -263,7 +268,7 @@ const startPrintWayBill = function (params: Params) {
         // @ts-ignore
         window.onmessage = function (res) {
             if (res.data.action === "newWaybillNo") {
-                res.data.value.includes("失败") ? reject(res.data.value) : resolve(res.data.value)
+                res.data.value.includes("失败") ? reject(res.data) : resolve(res.data)
 
             }
         }
@@ -307,7 +312,7 @@ function injectCustomjs() {
 
             if (!td) return;
             let tdObserve = new MutationObserver(function (mutations, observe) {
-                console.log(mutations, 'mutations')
+                // console.log(mutations, 'mutations')
                 mutations.forEach(item => {
                     item.addedNodes.forEach(node => {
 
@@ -316,12 +321,12 @@ function injectCustomjs() {
                         if (node.nodeType == 3 && node.parentElement?.className.includes("text-danger")) {
 
                             // @ts-ignore
-                            return window.postMessage({ action: "sendNewWaybillNo", value: node?.wholeText }, "*")
+                            return window.postMessage({ action: "sendNewWaybillNo", value: node?.wholeText, result: false }, "*")
                         }
                         if (node.nodeName == "DIV") {
                             let text = node.childNodes[2].textContent;
-                            console.log(text, 'text')
-                            window.postMessage({ action: "sendNewWaybillNo", value: text }, "*")
+
+                            window.postMessage({ action: "sendNewWaybillNo", value: text, result: true }, "*")
                             // 从发货易页面发消息给bg
                             // chrome.runtime.sendMessage({ action: "newWaybillNo", value: text }, function (res) {
 
